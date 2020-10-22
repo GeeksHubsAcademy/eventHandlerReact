@@ -10,18 +10,22 @@ import axios from 'axios';
 
 const Register = () => {
 
+    //HOOKS /////////////////////////////////////
+
     const [user, setUser] = useState({
         nombre: "",
         apellidos: "",
         email: ""
     })
 
-    const [msError, setError] = useState("");
+    const [mensaje, setMensaje] = useState("");
 
-    const [cliente, setCliente] = useState([]);
+    // const [cliente, setCliente] = useState([]);
 
     const history = useHistory();
     
+    ///////////////////////////////////////////////////
+
     const manejaEstado = ev => {
         
         setUser({...user, [ev.target.name]: ev.target.type === "number" ? +ev.target.value : ev.target.value});
@@ -32,31 +36,40 @@ const Register = () => {
 
         //control de errores y Regex
         
-        if(user.nombre === "" || user.apellidos === "" || user.email === ""){
-            setError("Has olvidado rellenar alguno de los campos");
-            return; 
-        }
+        // if(user.nombre === "" || user.apellidos === "" || user.email === ""){
+        //     setMensaje("Has olvidado rellenar alguno de los campos");
+        //     return; 
+        // }
 
         //preparación de datos del body
 
-        let userBody = user;
+        let userBody = {
+            nombre : user.nombre,
+            apellidos : user.apellidos,
+            direccion : "calle falsa",
+            email : user.email,
+            telefono: "",
+            edad: 21,
+            password: "Admin1234!"
+        };
 
         //llamada axios a la base de datos
 
-        axios.post('http://localhost:3001/users/registro',userBody)
+        axios.post('aquiDepositamosLaDireccionDelEndpoint',userBody)
         .then(res=>{
             //console.log(res);
-            setCliente(res.data);
+            //setCliente(res.data);
             //guardamos en localstorage
-            setError("Querido", res.data.username, "bienvenido a nuestra plataforma");
+            console.log(res.data);
 
+            
+            setMensaje(`Querido  ${res.data.nombre}, bienvenido a nuestra plataforma`);
+           
             setTimeout(() => {
-                history.push({
-                    path: "/"
-                })
+                history.push("/")
             }, 1500);
         })
-        .catch(error=>setError(error.response.data.message))
+        .catch(error=>setMensaje(error.response.data.message));
 
 
     }
@@ -71,7 +84,7 @@ const Register = () => {
             <p>Email</p>
             <input type="email" maxLength="30" placeholder="" name="email" onChange={manejaEstado}></input>
             <button onClick={() => {enviaRegistro()}}>Enviar</button>
-            <div>{msError}</div>
+            <div>{mensaje}</div>
         </div>
     );
     
